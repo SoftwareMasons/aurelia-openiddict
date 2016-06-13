@@ -1,4 +1,4 @@
-﻿{
+{
     "userSecretsId": "aspnet-skeleton-navigation-typescript-vs-20160526030316",
 
     "dependencies": {
@@ -35,10 +35,11 @@
             "version": "1.0.0-preview1-final",
             "type": "build"
         },
-        "Microsoft.VisualStudio.Web.CodeGenerators.Mvc": {
-            "version": "1.0.0-preview1-final",
-            "type": "build"
-        }
+      "Microsoft.VisualStudio.Web.CodeGenerators.Mvc": {
+        "version": "1.0.0-preview1-final",
+        "type": "build"
+      },
+      "OpenIddict": "1.0.0-alpha2-0315"
     },
 
   "tools": {

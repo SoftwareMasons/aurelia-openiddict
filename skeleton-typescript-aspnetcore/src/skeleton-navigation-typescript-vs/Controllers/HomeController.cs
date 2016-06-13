@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-namespace skeleton_navigation_typescript_vs.Controllers
+namespace skeleton_navigation_typescript_vs.Data.Controllers
 {
     public class HomeController : Controller
     {

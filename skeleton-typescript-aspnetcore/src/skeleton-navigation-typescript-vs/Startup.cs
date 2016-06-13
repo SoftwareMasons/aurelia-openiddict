@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenIddict;
+using skeleton_navigation_typescript_vs.Data;
+using skeleton_navigation_typescript_vs.Models;
+using skeleton_navigation_typescript_vs.Services;
 
 namespace skeleton_navigation_typescript_vs
 {
@@ -22,8 +26,6 @@ namespace skeleton_navigation_typescript_vs
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
 
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-                builder.AddApplicationInsightsSettings(developerMode: true);
             }
 
             builder.AddEnvironmentVariables();
@@ -36,12 +38,18 @@ namespace skeleton_navigation_typescript_vs
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.AddMvc();
 
             // Add application services.
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +61,7 @@ namespace skeleton_navigation_typescript_vs
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else
@@ -62,6 +71,8 @@ namespace skeleton_navigation_typescript_vs
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseIdentity();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 
