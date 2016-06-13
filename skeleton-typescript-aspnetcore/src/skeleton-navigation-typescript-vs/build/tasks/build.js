@@ -37,7 +37,7 @@ gulp.task('build-html', function() {
 gulp.task('build-css', function() {
   return gulp.src(paths.css)
     .pipe(changed(paths.output, {extension: '.css'}))
-    .pipe(gulp.dest(paths.output));
+    .pipe(gulp.dest(paths.cssOutput));
 });
 
 // runs jspm install from within Gulp
