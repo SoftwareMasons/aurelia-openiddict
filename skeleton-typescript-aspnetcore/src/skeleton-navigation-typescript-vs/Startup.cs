@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenIddict;
 using skeleton_navigation_typescript_vs.Data;
 using skeleton_navigation_typescript_vs.Models;
 using skeleton_navigation_typescript_vs.Services;
@@ -47,6 +46,11 @@ namespace skeleton_navigation_typescript_vs
 
             services.AddMvc();
 
+            //  Register the OpenIddict services, includin gthe default EntityFramework stores.
+            services.AddOpenIddict<ApplicationUser, ApplicationDbContext>()
+                .DisableHttpsRequirement()
+                .UseJsonWebTokens();
+                
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
@@ -73,6 +77,7 @@ namespace skeleton_navigation_typescript_vs
             app.UseStaticFiles();
 
             app.UseIdentity();
+            app.UseOpenIddict();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 

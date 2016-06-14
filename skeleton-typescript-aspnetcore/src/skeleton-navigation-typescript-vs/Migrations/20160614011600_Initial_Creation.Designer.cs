@@ -8,7 +8,7 @@ using skeleton_navigation_typescript_vs.Data;
 namespace skeletonnavigationtypescriptvs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160613172204_Initial_Creation")]
+    [Migration("20160614011600_Initial_Creation")]
     partial class Initial_Creation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,74 @@ namespace skeletonnavigationtypescriptvs.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("OpenIddict.OpenIddictApplication", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<string>("DisplayName");
+
+                    b.Property<string>("LogoutRedirectUri");
+
+                    b.Property<string>("RedirectUri");
+
+                    b.Property<string>("Secret");
+
+                    b.Property<string>("Type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenIddictApplications");
+                });
+
+            modelBuilder.Entity("OpenIddict.OpenIddictAuthorization", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<string>("Scope");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OpenIddictAuthorizations");
+                });
+
+            modelBuilder.Entity("OpenIddict.OpenIddictScope", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<string>("Description");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenIddictScopes");
+                });
+
+            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<string>("ApplicationId");
+
+                    b.Property<string>("AuthorizationId");
+
+                    b.Property<string>("Type");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
+
+                    b.HasIndex("AuthorizationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OpenIddictTokens");
+                });
+
             modelBuilder.Entity("skeleton_navigation_typescript_vs.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id");
@@ -207,6 +275,28 @@ namespace skeletonnavigationtypescriptvs.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("OpenIddict.OpenIddictAuthorization", b =>
+                {
+                    b.HasOne("skeleton_navigation_typescript_vs.Models.ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
+                {
+                    b.HasOne("OpenIddict.OpenIddictApplication")
+                        .WithMany()
+                        .HasForeignKey("ApplicationId");
+
+                    b.HasOne("OpenIddict.OpenIddictAuthorization")
+                        .WithMany()
+                        .HasForeignKey("AuthorizationId");
+
+                    b.HasOne("skeleton_navigation_typescript_vs.Models.ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
         }
     }
