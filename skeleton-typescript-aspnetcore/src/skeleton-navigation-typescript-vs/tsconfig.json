@@ -12,7 +12,8 @@
     "removeComments": true,
     "noLib": false,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "moduleResolution": "classic"
   },
   "filesGlob": [
     "./src/**/*.ts",
@@ -24,7 +25,8 @@
   "exclude": [
     "node_modules",
     "typings/main",
-    "typings/main.d.ts"
+    "typings/main.d.ts",
+    "wwwroot"
   ],
   "atom": {
     "rewriteTsconfig": false
