@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define(["require", "exports", 'aurelia-framework'], function (require, exports, aurelia_framework_1) {
+define(["require", "exports", 'aurelia-dependency-injection'], function (require, exports, aurelia_dependency_injection_1) {
     "use strict";
     var BlurImageCustomAttribute = (function () {
         function BlurImageCustomAttribute(element) {
@@ -24,7 +24,7 @@ define(["require", "exports", 'aurelia-framework'], function (require, exports, 
             }
         };
         BlurImageCustomAttribute = __decorate([
-            aurelia_framework_1.autoinject, 
+            aurelia_dependency_injection_1.autoinject, 
             __metadata('design:paramtypes', [Element])
         ], BlurImageCustomAttribute);
         return BlurImageCustomAttribute;
@@ -266,4 +266,3 @@ define(["require", "exports", 'aurelia-framework'], function (require, exports, 
     }
     ;
 });
-//# sourceMappingURL=blur-image.js.map

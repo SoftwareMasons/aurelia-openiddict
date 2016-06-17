@@ -1,6 +1,6 @@
 import 'bootstrap';
 import {Aurelia} from 'aurelia-framework';
-import {AuthService} from 'aurelia-authentication';
+import {AuthService,AuthenticatedFilterValueConverter} from 'aurelia-authentication';
 import authConfig from './authConfig';
 
 export function configure(aurelia: Aurelia) {
@@ -18,7 +18,7 @@ export function configure(aurelia: Aurelia) {
     aurelia.use.plugin('aurelia-authentication', baseConfig => {
         baseConfig.configure(authConfig);
     });
- 
+
     //Anyone wanting to use HTMLImports to load views, will need to install the following plugin.
     //aurelia.use.plugin('aurelia-html-import-template-loader')
 

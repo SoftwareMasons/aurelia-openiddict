@@ -1,4 +1,5 @@
 /// <reference path="globals/angular-protractor/index.d.ts" />
+/// <reference path="globals/aurelia-api/index.d.ts" />
 /// <reference path="globals/aurelia-authentication/index.d.ts" />
 /// <reference path="globals/aurelia-binding/index.d.ts" />
 /// <reference path="globals/aurelia-bootstrapper/index.d.ts" />

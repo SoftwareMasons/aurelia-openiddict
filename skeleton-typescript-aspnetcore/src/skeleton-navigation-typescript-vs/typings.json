@@ -1,6 +1,7 @@
 {
   "name": "aurelia-skeleton-navigation-typescript-aspnet5",
   "globalDependencies": {
+    "aurelia-api": "github:spoonx/aurelia-api/dist/es2015/aurelia-api.d.ts",
     "aurelia-authentication": "github:spoonx/aurelia-authentication/dist/system/aurelia-authentication.d.ts",
     "aurelia-binding": "github:aurelia/binding/dist/aurelia-binding.d.ts#69d54dbebafe87738f89b8ac4109921544d202cb",
     "aurelia-bootstrapper": "github:aurelia/bootstrapper/dist/aurelia-bootstrapper.d.ts#111ee4eb1e5df7af39305d190d635df7d93cb7e5",

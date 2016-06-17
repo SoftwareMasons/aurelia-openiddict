@@ -1,8 +1,9 @@
 ﻿export default {
     endpoint: 'connect',
+    configureEndpoints: ['connect'],
     loginUrl: '/token',  
     signupUrl: 'users',
-    profileUrl: 'me',
+    profileUrl: '/userinfo',
     unlinkUrl: 'me/unlink',
     loginOnSignup: false,
     providers: {

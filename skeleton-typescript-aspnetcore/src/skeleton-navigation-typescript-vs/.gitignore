@@ -186,6 +186,7 @@ wwwroot/dist/
 wwwroot/lib/
 wwwroot/jspm_packages/
 orleans.codegen.cs
+typings/
 
 # RIA/Silverlight projects
 Generated_Code/

@@ -1,9 +1,9 @@
 {
   "version": "1.7.3",
-  "compileOnSave": false,
+  "compileOnSave": true,
   "compilerOptions": {
     "rootDir": "src/",
-    "sourceMap": true,
+    "sourceMap": false,
     "target": "es5",
     "module": "amd",
     "declaration": false,
@@ -19,8 +19,7 @@
     "./src/**/*.ts",
     "./test/**/*.ts",
     "./typings/browser.d.ts",
-    "./custom_typings/**/*.d.ts",
-    "./wwwroot/jspm_packages/**/*.d.ts"
+    "./custom_typings/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
