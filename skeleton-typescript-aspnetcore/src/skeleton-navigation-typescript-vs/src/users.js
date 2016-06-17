@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define(["require", "exports", 'aurelia-framework', 'aurelia-fetch-client', 'fetch'], function (require, exports, aurelia_framework_1, aurelia_fetch_client_1) {
+define(["require", "exports", 'aurelia-dependency-injection', 'aurelia-fetch-client', 'fetch'], function (require, exports, aurelia_dependency_injection_1, aurelia_fetch_client_1) {
     "use strict";
     var Users = (function () {
         function Users(http) {
@@ -27,11 +27,10 @@ define(["require", "exports", 'aurelia-framework', 'aurelia-fetch-client', 'fetc
                 .then(function (users) { return _this.users = users; });
         };
         Users = __decorate([
-            aurelia_framework_1.autoinject, 
+            aurelia_dependency_injection_1.autoinject, 
             __metadata('design:paramtypes', [aurelia_fetch_client_1.HttpClient])
         ], Users);
         return Users;
     }());
     exports.Users = Users;
 });
-//# sourceMappingURL=users.js.map

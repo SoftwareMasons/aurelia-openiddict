@@ -1,18 +1,30 @@
-import {Router, RouterConfiguration} from 'aurelia-router'
+import 'bootstrap';
+import {inject} from 'aurelia-dependency-injection';
+import {Router} from 'aurelia-router';
+import AppRouterConfig from './app.router.config';
+import {FetchConfig} from 'aurelia-authentication';
 
+@inject(Router, FetchConfig, AppRouterConfig)
 export class App {
-  router: Router;
-  
-  configureRouter(config: RouterConfiguration, router: Router) {
-    config.title = 'Aurelia';
-    config.map([
-      { route: ['', 'welcome'], name: 'welcome',        moduleId: 'welcome',        nav: true, title: 'Welcome' },
-      { route: 'users',         name: 'users',          moduleId: 'users',          nav: true, title: 'Github Users' },
-      { route: 'child-router',  name: 'child-router',   moduleId: 'child-router',   nav: true, title: 'Child Router' },
-      { route: 'login',         name: 'login',          moduleId: 'login',          nav: true, title: 'Login' }
+    router: Router;
+    appRouterConfig: AppRouterConfig;
+    fetchConfig: FetchConfig;
 
-    ]);
+    constructor(router, fetchConfig, appRouterConfig) {
+        this.router = router;
+        this.fetchConfig = fetchConfig;
+        this.appRouterConfig = appRouterConfig;
+    }
 
-    this.router = router;
-  }
+    activate() {
+        this.appRouterConfig.configure();
+        this.fetchConfig.configure();
+    }
 }
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-import {autoinject} from 'aurelia-framework';
+import {autoinject} from 'aurelia-dependency-injection';
 import {HttpClient} from 'aurelia-fetch-client';
 import 'fetch';
 
