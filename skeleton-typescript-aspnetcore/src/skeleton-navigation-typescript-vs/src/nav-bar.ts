@@ -31,8 +31,7 @@ export class NavBar {
 
     @computedFrom('auth.authenticated')
     get isAuthenticated(): boolean {
-        console.log('Read isAuthenticated');
-        return this.auth.authenticated;
+g        return this.auth.authenticated;
     }
 
     private updateDisplayName() {
