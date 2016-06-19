@@ -28,7 +28,6 @@ define(["require", "exports", 'aurelia-framework', 'aurelia-authentication', 'au
         }
         Object.defineProperty(NavBar.prototype, "isAuthenticated", {
             get: function () {
-                console.log('Read isAuthenticated');
                 return this.auth.authenticated;
             },
             enumerable: true,
