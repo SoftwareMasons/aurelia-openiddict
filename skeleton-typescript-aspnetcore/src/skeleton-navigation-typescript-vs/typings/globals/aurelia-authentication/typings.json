@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/spoonx/aurelia-authentication/master/dist/system/aurelia-authentication.d.ts",
-    "raw": "github:spoonx/aurelia-authentication/dist/system/aurelia-authentication.d.ts",
-    "typings": "https://raw.githubusercontent.com/spoonx/aurelia-authentication/master/dist/system/aurelia-authentication.d.ts"
-  }
-}
