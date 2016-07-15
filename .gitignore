@@ -243,5 +243,8 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-*.js
 *.map
+client/src/**/*.js
+client/test/**/*.js
+client/wwwroot/**/*.js
+!client/wwwroot/config.js

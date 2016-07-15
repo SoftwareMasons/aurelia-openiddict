@@ -21,7 +21,7 @@ using server.Models.AuthorizationViewModels;
 using server.Models.SharedViewModels;
 using OpenIddict;
 
-namespace Mvc.Server {
+namespace server.Server {
     public class AuthorizationController : Controller {
         private readonly OpenIddictApplicationManager<OpenIddictApplication> _applicationManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
