@@ -1,6 +1,7 @@
 {
   "name": "aurelia-skeleton-navigation-typescript-aspnetcore",
   "dependencies": {
+    "aurelia-api": "github:spoonx/aurelia-api",
     "aurelia-binding": "github:aurelia/binding",
     "aurelia-bootstrapper": "github:aurelia/bootstrapper",
     "aurelia-dependency-injection": "github:aurelia/dependency-injection",

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src/",
     "outDir": "wwwroot/dist",
-    "sourceMap": true,
+    "sourceMap": false,
     "target": "es5",
     "module": "amd",
     "declaration": false,

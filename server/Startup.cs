@@ -40,6 +40,8 @@ namespace server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -52,7 +54,9 @@ namespace server
             services.AddOpenIddict<ApplicationUser, ApplicationDbContext>()
                 .EnableAuthorizationEndpoint("/connect/authorize")
                 .EnableLogoutEndpoint("/connect/logout")
+                .EnableUserinfoEndpoint("/connect/userinfo")
                 .AllowImplicitFlow()
+                .UseJsonWebTokens()
                 .DisableHttpsRequirement();
 
             services.AddMvc();
@@ -79,11 +83,32 @@ namespace server
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseCors(options =>
+            {
+                options
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:49862");
+            });
+
             app.UseStaticFiles();
 
             app.UseIdentity();
 
             app.UseOAuthValidation();
+
+            app.UseGoogleAuthentication(new GoogleOptions
+            {
+                ClientId = "560027070069-37ldt4kfuohhu3m495hk2j4pjp92d382.apps.googleusercontent.com",
+                ClientSecret = "n2Q-GEw9RQjzcRbU3qhfTj8f"
+            });
+
+            app.UseTwitterAuthentication(new TwitterOptions
+            {
+                ConsumerKey = "6XaCTaLbMqfj6ww3zvZ5g",
+                ConsumerSecret = "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI"
+            });
+
             app.UseOpenIddict();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
