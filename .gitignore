@@ -246,5 +246,3 @@ ModelManifest.xml
 *.map
 client/src/**/*.js
 client/test/**/*.js
-client/wwwroot/**/*.js
-!client/wwwroot/config.js
