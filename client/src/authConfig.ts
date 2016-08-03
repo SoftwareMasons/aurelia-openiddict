@@ -1,7 +1,6 @@
 ﻿export default {
     endpoint: 'connect',
-    configureEndpoints: ['connect'],
-    logoutUrl: '/logout',
+    configureEndpoints: ['connect', 'logout'],
     profileUrl: '/userinfo',
     providers: {
         openiddict: {
@@ -10,9 +9,9 @@
             oauthType: '2.0',
             clientId: 'aurelia-openiddict',
             loginRedirect: '/#',
-            redirectUri: 'http://localhost:49862/',
+            redirectUri: 'http://localhost:49862',
             authorizationEndpoint: 'http://localhost:54540/connect/authorize',
-            responseType: 'token',
+            responseType: 'token id_token',
             scope: ['openid email profile'],
             requiredUrlParams: ['scope', 'nonce'],
             nonce: function () {

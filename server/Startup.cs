@@ -52,12 +52,12 @@ namespace server
 
             //  Register the OpenIddict services, including the default Entity Framework stores.
             services.AddOpenIddict<ApplicationUser, ApplicationDbContext>()
-                .EnableAuthorizationEndpoint("/connect/authorize")
                 .EnableLogoutEndpoint("/connect/logout")
+                .EnableAuthorizationEndpoint("/connect/authorize")
                 .EnableUserinfoEndpoint("/connect/userinfo")
                 .AllowImplicitFlow()
-                .UseJsonWebTokens()
-                .DisableHttpsRequirement();
+                .DisableHttpsRequirement()
+                .AddEphemeralSigningKey(); 
 
             services.AddMvc();
 
@@ -76,7 +76,7 @@ namespace server
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                app.UseBrowserLink();
+                //app.UseBrowserLink();
             }
             else
             {
@@ -89,6 +89,7 @@ namespace server
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .WithOrigins("http://localhost:49862");
+                    //.AllowAnyOrigin();
             });
 
             app.UseStaticFiles();

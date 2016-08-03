@@ -43,7 +43,7 @@
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
-    "OpenIddict": "1.0.0-alpha2-0383",
+    "OpenIddict": "1.0.0-alpha2-*",
     "AspNet.Security.OAuth.Validation": "1.0.0-alpha2-final",
     "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0",
     "Microsoft.AspNetCore.Cors": "1.0.0",
