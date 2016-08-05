@@ -2,6 +2,8 @@
 import {inject} from 'aurelia-dependency-injection';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {Config, Rest} from 'aurelia-api';
+import {LogManager} from 'aurelia-framework';
+import {Logger} from 'aurelia-logging';
 
 class AuthResponse {
     token_type: string;
@@ -15,36 +17,34 @@ export class Logout {
     authService: AuthService = null;
     eventAggregator: EventAggregator;
     authEndpoint: Rest;
+    private logger: Logger;
 
     constructor(authService, eventAggregator, config) {
         this.authService = authService;
         this.eventAggregator = eventAggregator;
         this.authEndpoint = config.getEndpoint('logout');
+        this.logger = LogManager.getLogger('Logout');
     };
 
     activate() {
         let authResponse: AuthResponse = JSON.parse(localStorage.getItem('aurelia_authentication'));
-        //let logoutUrl: string = encodeURIComponent('/logout?post_logout_redirect_uri=http://localhost:49862&id_token_hint=' + authResponse.id_token);
-        let logoutUrl = '/logout';
-        let logoutParms = {
-            post_logout_redirect_uri: 'http://localhost:49862/Authentication/Logout',
-            id_token_hint: authResponse.id_token
-        };
-        //  get authentication cookie 
-        var cookies = document.cookie;
+        let logoutUrl: string = '/logout?post_logout_redirect_uri=' + encodeURIComponent('http://localhost:49862') + '&id_token_hint=' + encodeURIComponent(authResponse.id_token);
         this.authService.logout()
             .then(response => {
-                this.authEndpoint.request('post', logoutUrl, logoutParms, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+                this.authEndpoint.request('get', logoutUrl, undefined, { credentials: 'include', mode: 'no-cors' })
                     .then(response => {
-                        console.log("call to logoutUrl successful");
+                        this.logger.info("logout successful");
                         this.eventAggregator.publish('authChanged');
                     })
                     .catch(err => {
-                        console.log("call to logoutUrl failed");
+                        if (err.status === 0) {
+                            this.logger.info("logout successful");
+                            this.eventAggregator.publish('authChanged');
+                        }
                     });
             })
             .catch(err => {
-                console.log("error logged out  logout.js");
+                this.logger.info("error logging out");
             });
     }
 }

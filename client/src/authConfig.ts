@@ -1,7 +1,8 @@
 ﻿export default {
-    endpoint: 'connect',
-    configureEndpoints: ['connect', 'logout'],
+    endpoint: 'auth',
+    configureEndpoints: ['auth'],
     profileUrl: '/userinfo',
+    withCredentials: true,
     providers: {
         openiddict: {
             name: 'openiddict',

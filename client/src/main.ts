@@ -13,9 +13,9 @@ export function configure(aurelia: Aurelia) {
 
   aurelia.use.plugin('aurelia-api', config => {
       config
-          .registerEndpoint('connect', 'http://localhost:54540/connect')
+          .registerEndpoint('auth', 'http://localhost:54540/connect')
           .registerEndpoint('github', 'https://api.github.com/')
-          .registerEndpoint('logout', 'http://localhost:54540/connect', { headers: { 'Content-Type' : 'application/x-www-form-urlencoded' }, mode: 'cors' });
+          .registerEndpoint('logout', 'http://localhost:54540/connect');
 
   });
     //

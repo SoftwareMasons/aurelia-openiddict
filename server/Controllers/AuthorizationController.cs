@@ -136,30 +136,30 @@ namespace server.Server {
         //    // to redirect the user agent to the client tion using the appropriate response_mode.
         //    return Forbid(OpenIdConnectServerDefaults.AuthenticationScheme);
         //}
-        [HttpGet("~/connect/logout")]
-        public IActionResult Logout()
-        {
-            // Extract the authorization request from the ASP.NET environment.
-            var request = HttpContext.GetOpenIdConnectRequest();
+    //    [HttpGet("~/connect/logout")]
+    //    public IActionResult Logout()
+    //    {
+    //        // Extract the authorization request from the ASP.NET environment.
+    //        var request = HttpContext.GetOpenIdConnectRequest();
 
-            return View(new LogoutViewModel
-            {
-                Parameters = request.Parameters
-            });
-        }
+    //        return View(new LogoutViewModel
+    //        {
+    //            Parameters = request.Parameters
+    //        });
+    //    }
 
-        [HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
-        {
-            // Ask ASP.NET Core Identity to delete the local and external cookies created
-            // when the user agent is redirected from the external identity provider
-            // after a successful authentication flow (e.g Google or Facebook).
-            await _signInManager.SignOutAsync();
+    //    [HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
+    //    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    //    {
+    //        // Ask ASP.NET Core Identity to delete the local and external cookies created
+    //        // when the user agent is redirected from the external identity provider
+    //        // after a successful authentication flow (e.g Google or Facebook).
+    //        await _signInManager.SignOutAsync();
 
-            // Returning a SignOutResult will ask OpenIddict to redirect the user agent
-            // to the post_logout_redirect_uri specified by the client application.
-            return SignOut(OpenIdConnectServerDefaults.AuthenticationScheme);
-        }
+    //        // Returning a SignOutResult will ask OpenIddict to redirect the user agent
+    //        // to the post_logout_redirect_uri specified by the client application.
+    //        return SignOut(OpenIdConnectServerDefaults.AuthenticationScheme);
+    //    }
 
     }
 }

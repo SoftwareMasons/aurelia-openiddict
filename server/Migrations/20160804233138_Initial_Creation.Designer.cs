@@ -8,7 +8,7 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160714022124_Initial_Creation")]
+    [Migration("20160804233138_Initial_Creation")]
     partial class Initial_Creation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
