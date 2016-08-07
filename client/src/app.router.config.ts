@@ -18,6 +18,7 @@ export class AppRouterConfig {
             config.map([
                 { route: ['', 'welcome'], moduleId: './welcome', nav: true, title: 'Welcome' },
                 { route: 'users', name: 'users', moduleId: './users', nav: true, title: 'Github Users', auth: true },
+                { route: 'todo', name: 'todo', moduleId: './todo', nav: true, title: 'ToDo Items', auth: true },
                 { route: 'child-router', moduleId: './child-router', nav: true, title: 'Child Router' },
                 { route: 'login', moduleId: './login', nav: false, title: 'Login' },
                 { route: 'logout', moduleId: './logout', nav: false, title: 'Logout' }

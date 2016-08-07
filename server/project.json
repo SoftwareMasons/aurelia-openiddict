@@ -48,7 +48,8 @@
     "Microsoft.AspNetCore.Cors": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0",
-    "OpenIddict": "1.0.0-alpha2-0404" },
+    "OpenIddict": "1.0.0-alpha2-*",
+    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0"},
 
   "tools": {
     "BundlerMinifier.Core": "2.0.238",

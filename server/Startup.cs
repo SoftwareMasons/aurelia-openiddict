@@ -13,6 +13,7 @@ using server.Data;
 using server.Models;
 using server.Services;
 using OpenIddict;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace server
 {
@@ -57,7 +58,12 @@ namespace server
                 .EnableUserinfoEndpoint("/connect/userinfo")
                 .AllowImplicitFlow()
                 .DisableHttpsRequirement()
-                .AddEphemeralSigningKey(); 
+                .UseJsonWebTokens()
+                .Configure(configuration =>
+                {
+                
+                })
+                .AddEphemeralSigningKey();
 
             services.AddMvc();
 
@@ -76,7 +82,7 @@ namespace server
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                //app.UseBrowserLink();
+                app.UseBrowserLink();
             }
             else
             {
@@ -89,14 +95,11 @@ namespace server
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .WithOrigins("http://localhost:49862");
-                    //.AllowAnyOrigin();
             });
 
             app.UseStaticFiles();
 
             app.UseIdentity();
-
-            app.UseOAuthValidation();
 
             app.UseGoogleAuthentication(new GoogleOptions
             {
@@ -108,6 +111,15 @@ namespace server
             {
                 ConsumerKey = "6XaCTaLbMqfj6ww3zvZ5g",
                 ConsumerSecret = "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI"
+            });
+
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
+                Audience = "aurelia-openiddict",
+                Authority = "http://localhost:54540/",
+                RequireHttpsMetadata = false,
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
             });
 
             app.UseOpenIddict();

@@ -15,7 +15,8 @@ export function configure(aurelia: Aurelia) {
       config
           .registerEndpoint('auth', 'http://localhost:54540/connect')
           .registerEndpoint('github', 'https://api.github.com/')
-          .registerEndpoint('logout', 'http://localhost:54540/connect');
+          .registerEndpoint('logout', 'http://localhost:54540/connect')
+          .registerEndpoint('resources', 'http://localhost:25000/api/');
 
   });
     //

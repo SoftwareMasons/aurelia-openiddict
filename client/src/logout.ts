@@ -28,7 +28,7 @@ export class Logout {
 
     activate() {
         let authResponse: AuthResponse = JSON.parse(localStorage.getItem('aurelia_authentication'));
-        let logoutUrl: string = '/logout?post_logout_redirect_uri=' + encodeURIComponent('http://localhost:49862') + '&id_token_hint=' + encodeURIComponent(authResponse.id_token);
+        let logoutUrl: string = '/logout?post_logout_redirect_uri=' + encodeURIComponent('http://localhost:49862/') + '&id_token_hint=' + encodeURIComponent(authResponse.id_token);
         this.authService.logout()
             .then(response => {
                 this.authEndpoint.request('get', logoutUrl, undefined, { credentials: 'include', mode: 'no-cors' })

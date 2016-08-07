@@ -1,8 +1,7 @@
 ﻿export default {
     endpoint: 'auth',
-    configureEndpoints: ['auth'],
+    configureEndpoints: ['auth', 'resources'],
     profileUrl: '/userinfo',
-    withCredentials: true,
     providers: {
         openiddict: {
             name: 'openiddict',
@@ -10,7 +9,7 @@
             oauthType: '2.0',
             clientId: 'aurelia-openiddict',
             loginRedirect: '/#',
-            redirectUri: 'http://localhost:49862',
+            redirectUri: 'http://localhost:49862/',
             authorizationEndpoint: 'http://localhost:54540/connect/authorize',
             responseType: 'token id_token',
             scope: ['openid email profile'],
