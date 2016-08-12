@@ -38,7 +38,7 @@ export class NavBar {
     }
 
     authenticate() {
-        return this.auth.authenticate('openiddict', undefined, null)
+        return this.auth.authenticate('openiddict', 'http://localhost:49862/', { resource: 'aurelia-openiddict-resources' })
             .then((response) => {
                 this.logger.info("login successful");
                 this.eventAggregator.publish('authChanged');

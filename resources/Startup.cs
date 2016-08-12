@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using resources.Models;
-using AspNet.Security.OAuth.Validation;
+using resources.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace resources
 {
@@ -29,11 +29,11 @@ namespace resources
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add our repository type
-            services.AddSingleton<ITodoItemRepository, TodoItemRepository>();
 
             services.AddCors();
 
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             // Add framework services.
             services.AddMvc();
         }
@@ -52,18 +52,12 @@ namespace resources
                 options.AllowAnyOrigin();
             });
 
-            //app.UseOAuthValidation(new OAuthValidationOptions()
-            //{
-            //    AutomaticAuthenticate = true,
-            //    AutomaticChallenge = true,
-            //});
-
             app.UseJwtBearerAuthentication(new JwtBearerOptions()
             {
                 RequireHttpsMetadata = false,
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
-                Audience = "aurelia-openiddict",
+                Audience = "aurelia-openiddict-resources",
                 Authority = "http://localhost:54540/"
             });
 

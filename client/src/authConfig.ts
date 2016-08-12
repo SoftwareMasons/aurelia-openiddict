@@ -13,7 +13,7 @@
             authorizationEndpoint: 'http://localhost:54540/connect/authorize',
             responseType: 'token id_token',
             scope: ['openid email profile'],
-            requiredUrlParams: ['scope', 'nonce'],
+            requiredUrlParams: ['scope', 'nonce', 'resource'],
             nonce: function () {
                 var text = "";
                 var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -22,7 +22,8 @@
                 }
                 return text;
             },
-            popupOptions: { width: 1028, height: 529 }
+            popupOptions: { width: 1028, height: 529 },
+            resource: 'aurelia-openiddict-resources aurelia-openiddict-server'
         }
     }
 };

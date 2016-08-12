@@ -9,6 +9,11 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "client", "client\client.xpr
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "resources", "resources\resources.xproj", "{206DD4CA-899D-4D60-8739-ADB44DB8F78B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3E41BCF6-5BD4-4EBB-B56F-29F2C9C00FB2}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

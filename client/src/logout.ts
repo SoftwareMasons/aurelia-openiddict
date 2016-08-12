@@ -22,13 +22,14 @@ export class Logout {
     constructor(authService, eventAggregator, config) {
         this.authService = authService;
         this.eventAggregator = eventAggregator;
-        this.authEndpoint = config.getEndpoint('logout');
+        this.authEndpoint = config.getEndpoint('auth');
         this.logger = LogManager.getLogger('Logout');
     };
 
     activate() {
         let authResponse: AuthResponse = JSON.parse(localStorage.getItem('aurelia_authentication'));
         let logoutUrl: string = '/logout?post_logout_redirect_uri=' + encodeURIComponent('http://localhost:49862/') + '&id_token_hint=' + encodeURIComponent(authResponse.id_token);
+
         this.authService.logout()
             .then(response => {
                 this.authEndpoint.request('get', logoutUrl, undefined, { credentials: 'include', mode: 'no-cors' })

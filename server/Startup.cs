@@ -14,6 +14,7 @@ using server.Models;
 using server.Services;
 using OpenIddict;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace server
 {
@@ -58,11 +59,9 @@ namespace server
                 .EnableUserinfoEndpoint("/connect/userinfo")
                 .AllowImplicitFlow()
                 .DisableHttpsRequirement()
+                    
+                // To use JSONWebTokens, uncomment the following line.
                 .UseJsonWebTokens()
-                .Configure(configuration =>
-                {
-                
-                })
                 .AddEphemeralSigningKey();
 
             services.AddMvc();
@@ -113,13 +112,17 @@ namespace server
                 ConsumerSecret = "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI"
             });
 
+
+            //  If using JSONWebTokens, uncomment the following lines and
+            //  comment out the line above that is used for the default
+            //  opaque token usage.
             app.UseJwtBearerAuthentication(new JwtBearerOptions()
             {
-                Audience = "aurelia-openiddict",
+                Audience = "aurelia-openiddict-server",
                 Authority = "http://localhost:54540/",
                 RequireHttpsMetadata = false,
                 AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
+                AutomaticChallenge = true
             });
 
             app.UseOpenIddict();

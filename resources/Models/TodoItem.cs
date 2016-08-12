@@ -7,8 +7,9 @@ namespace resources.Models
 {
     public class TodoItem
     {
-        public string Key { get; set; }
-        public string Name { get; set; }
-        public bool IsComplete { get; set; }
+        public string UserId { get; set;  }
+        public int Id { get; set; }
+        public string Description { get; set; }
+        public bool Completed { get; set; }
     }
 }

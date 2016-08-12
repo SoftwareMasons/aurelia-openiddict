@@ -1,3 +1,21 @@
 ﻿<template>
-    <section class="au-animate"></section>
-</template>
+    <section class="au-animate">
+        <h2>Todo Items</h2>
+        <form role="form">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td class="col-md-10">Description</td>
+                        <td class="col-md-2">Completed?</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="tdi of todoItems">
+                        <td class="col-md-10"><span>${tdi.description}</span></td>
+                        <td class="col-md-2">${tdi.completed}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </section>
+</template> 

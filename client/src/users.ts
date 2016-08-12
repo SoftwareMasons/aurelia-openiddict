@@ -1,19 +1,19 @@
 import {inject} from 'aurelia-dependency-injection';
-import {Endpoint} from 'aurelia-api';
+import {Endpoint, Rest} from 'aurelia-api';
 import 'fetch';
 
 @inject(Endpoint.of('github'))
 export class Users {
   heading = 'Github Users';
   users = [];
-  private githubEndpoint: Endpoint;
+  private githubClient: Rest;
 
-  constructor(private endPoint: Endpoint) {
-      this.githubEndpoint = endPoint;
+  constructor(private endPoint: Rest) {
+      this.githubClient = endPoint;
   }
 
   activate() {
-      return this.githubEndpoint.find('users')
+      return this.githubClient.find('users')
           .then(users => this.users = users);
   }
 }
