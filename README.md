@@ -8,8 +8,7 @@
 This repository demonstrates how authentication can be added simply to the **[aurelia/skeleton-typescript-aspnetcore](https://github.com/aurelia/skeleton-navigation)** starter kit
 by integrating with **[OpenIddict](https://github.com/openiddict/openiddict-core)**, the powerful turnkey implementation of the 
 [OpenId Connect specifications](http://openid.net/specs/openid-connect-core-1_0.html) actively maintained and supported by
-**[Kévin Chalet](https://github.com/PinpointTownes)**. There are many potential applications where integration of a solution based on a 
-Single Page Application In addition to the libraries already referenced by the Aurelia starter kit, two additional
+**[Kévin Chalet](https://github.com/PinpointTownes)**. In addition to the libraries already referenced by the Aurelia starter kit, two additional
 Aurelia libraries supported by the SpoonX development group, [aurelia-api](https://github.com/SpoonX/aurelia-api) and [aurelia-authentication](https://github.com/SpoonX/aurelia-api), are used to 
 facilitate client integration with both the authorization and resource servers. Unlike the approach used by the popular **[Angular-based 
 Satellizer](https://github.com/sahat/satellizer)** library on which the aurelia-authentication library is based, this solution retrieves an access token to unlock protected 
