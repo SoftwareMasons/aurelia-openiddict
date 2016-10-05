@@ -36,7 +36,7 @@ are physically separated.
 
 ### Client Project
 
-The client project has the same dependencies as the aurelia / skeleton-typescript-aspnetcore project. To run the application, you'll need to have both
+The **client** project has the same dependencies as the aurelia / skeleton-typescript-aspnetcore project. To run the application, you'll need to have both
 **[node.js](https://chocolatey.org/packages/nodejs)** and **[git](https://chocolatey.org/packages/git.install)** installed. You can use 
 [chocolatey](https://chocolatey.org/) to install both. Once node.js is installed, if not already installed globally, execute the following 
 commands to install gulp, jspm, and typings packages globally. 
@@ -67,6 +67,22 @@ Twitter social authentication providers.
 
 When you login from the client and successfully authenticate, the server will return several pieces of information back. 
 
-- access_token: saved in local storage with the key of aurelia-authentication and needed to access the protected web api resources. The name of the local storage key is configurable in the authConfig.ts file.
-- id_token: also saved in local storage with the key of aurelia-authentication. The id_token is needed for successful calls to the Logout endpoint, and
-- ASP.NET Identity saves an authentication cookie that is also needed for successful calls to the Logout endpoint._
+- **access_token**: saved in local storage with the default key value of aurelia-authentication and needed to access the protected web api resources. The name of the local storage key is configurable in the authConfig.ts file.
+- **id_token**: also saved in local storage with the default key value of aurelia-authentication. The id_token is needed for successful calls to the Logout endpoint, and
+- **authentication cookie**: ASP.NET Identity saves an authentication cookie that is also needed for successful calls to the Logout endpoint.
+
+## How the solution was created
+
+### Server Project
+
+The following steps were followed in the creation of the **server project**.
+
+1. Create a new ASP.Net Core Web Application leveraging individual user account authentication.
+      1. Click on File - New Project.
+      2. Under Visual C# – .NET Core, pick the ASP.NET Core Web Application (.NET Core) template.
+      3. On the New ASP.NET Core Project dialog, pick the Web Application template.
+      4. Click Change Authentication and pick Individual User Account authentication.
+2. Integrate OpenIddict into the request pipeline
+     1. Following all steps outlined in the Readme.
+
+
