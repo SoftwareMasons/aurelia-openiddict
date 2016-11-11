@@ -44,6 +44,6 @@ describe('Navbar', () => {
           expect(sut.displayName).toBe('');
           done();
         });
-    };
+    });
   });
 });

@@ -53,13 +53,17 @@ namespace server
                 .AddDefaultTokenProviders();
 
             //  Register the OpenIddict services, including the default Entity Framework stores.
-            services.AddOpenIddict<ApplicationUser, ApplicationDbContext>()
+            services.AddOpenIddict<ApplicationDbContext>()
+                .AddMvcBinders()
+
                 .EnableLogoutEndpoint("/connect/logout")
                 .EnableAuthorizationEndpoint("/connect/authorize")
-                .EnableUserinfoEndpoint("/connect/userinfo")
+                .EnableUserinfoEndpoint("/Account/UserInfo")
                 .AllowImplicitFlow()
                 .DisableHttpsRequirement()
                     
+                //.EnableRequestCaching()
+
                 // To use JSONWebTokens, uncomment the following line.
                 .UseJsonWebTokens()
                 .AddEphemeralSigningKey();

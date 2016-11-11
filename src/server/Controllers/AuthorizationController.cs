@@ -4,9 +4,7 @@
  * the license and the contributors participating to this project.
  */
 
-using System;
-using System.Security.Claims;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
 using AspNet.Security.OpenIdConnect.Server;
@@ -16,35 +14,44 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using server.Models;
-using server.Models.AuthorizationViewModels;
-using server.Models.SharedViewModels;
 using OpenIddict;
-using System.Net.Http;
-using System.IO;
-using Microsoft.Net.Http.Headers;
-using System.Text;
+using server.Models;
+using server.Models.SharedViewModels;
 
-namespace server.Server {
-    public class AuthorizationController : Controller {
+namespace AuthorizationServer
+{
+    public class AuthorizationController : Controller
+    {
         private readonly OpenIddictApplicationManager<OpenIddictApplication> _applicationManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly OpenIddictUserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public AuthorizationController(
             OpenIddictApplicationManager<OpenIddictApplication> applicationManager,
             SignInManager<ApplicationUser> signInManager,
-            OpenIddictUserManager<ApplicationUser> userManager) {
+            UserManager<ApplicationUser> userManager)
+        {
             _applicationManager = applicationManager;
             _signInManager = signInManager;
             _userManager = userManager;
         }
 
-        [Authorize, HttpGet, Route("~/connect/authorize")]
+        [Authorize, HttpGet("~/connect/authorize")]
         public async Task<IActionResult> Authorize()
         {
             // Extract the authorization request from the ASP.NET environment.
             var request = HttpContext.GetOpenIdConnectRequest();
+
+            // Retrieve the application details from the database.
+            var application = await _applicationManager.FindByClientIdAsync(request.ClientId);
+            if (application == null)
+            {
+                return View("Error", new ErrorViewModel
+                {
+                    Error = OpenIdConnectConstants.Errors.InvalidClient,
+                    ErrorDescription = "Details concerning the calling client application cannot be found in the database"
+                });
+            }
 
             // Retrieve the profile of the logged in user.
             var user = await _userManager.GetUserAsync(User);
@@ -57,104 +64,19 @@ namespace server.Server {
                 });
             }
 
-            // Create a new ClaimsIdentity containing the claims that
-            // will be used to create an id_token, a token or a code.
-            var identity = await _userManager.CreateIdentityAsync(user, request.GetScopes());
-
-            // Create a new authentication ticket holding the user identity.
-            var ticket = new AuthenticationTicket(
-                new ClaimsPrincipal(identity),
-                new AuthenticationProperties(),
-                OpenIdConnectServerDefaults.AuthenticationScheme);
-
-            ticket.SetResources(request.GetResources());
-            ticket.SetScopes(request.GetScopes());
+            // Create a new authentication ticket.
+            var ticket = await CreateTicketAsync(request, user);
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
         }
 
-        //[Authorize, HttpGet, Route("~/connect/authorize")]
-        //public async Task<IActionResult> Authorize()
-        //{
-        //    // Extract the authorization request from the ASP.NET environment.
-        //    var request = HttpContext.GetOpenIdConnectRequest();
-
-        //    // Retrieve the application details from the database.
-        //    var application = await _applicationManager.FindByClientIdAsync(request.ClientId);
-        //    if (application == null)
-        //    {
-        //        return View("Error", new ErrorViewModel
-        //        {
-        //            Error = OpenIdConnectConstants.Errors.InvalidClient,
-        //            ErrorDescription = "Details concerning the calling client application cannot be found in the database"
-        //        });
-        //    }
-
-        //    return View(new AuthorizeViewModel
-        //    {
-        //        ApplicationName = application.DisplayName,
-        //        Parameters = request.Parameters,
-        //        Scope = request.Scope
-        //    });
-        //}
-
-        //[Authorize, HttpPost("~/connect/authorize/accept"), ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Accept()
-        //{
-        //    // Extract the authorization request from the ASP.NET environment.
-        //    var request = HttpContext.GetOpenIdConnectRequest();
-
-        //    // Retrieve the profile of the logged in user.
-        //    var user = await _userManager.GetUserAsync(User);
-        //    if (user == null)
-        //    {
-        //        return View("Error", new ErrorViewModel
-        //        {
-        //            Error = OpenIdConnectConstants.Errors.ServerError,
-        //            ErrorDescription = "An internal error has occurred"
-        //        });
-        //    }
-
-        //    // Create a new ClaimsIdentity containing the claims that
-        //    // will be used to create an id_token, a token or a code.
-        //    var identity = await _userManager.CreateIdentityAsync(user, request.GetScopes());
-
-        //    // Create a new authentication ticket holding the user identity.
-        //    var ticket = new AuthenticationTicket(
-        //        new ClaimsPrincipal(identity),
-        //        new AuthenticationProperties(),
-        //        OpenIdConnectServerDefaults.AuthenticationScheme);
-
-        //    ticket.SetResources(request.GetResources());
-        //    ticket.SetScopes(request.GetScopes());
-
-        //    // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-        //    return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
-        //}
-
-        //[Authorize, HttpPost("~/connect/authorize/deny"), ValidateAntiForgeryToken]
-        //public IActionResult Deny()
-        //{
-        //    // Notify OpenIddict that the authorization grant has been denied by the resource owner
-        //    // to redirect the user agent to the client tion using the appropriate response_mode.
-        //    return Forbid(OpenIdConnectServerDefaults.AuthenticationScheme);
-        //}
         [HttpGet("~/connect/logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             // Extract the authorization request from the ASP.NET environment.
             var request = HttpContext.GetOpenIdConnectRequest();
 
-            return View(new LogoutViewModel
-            {
-                RequestId = request.RequestId
-            });
-        }
-
-        [HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
-        {
             // Ask ASP.NET Core Identity to delete the local and external cookies created
             // when the user agent is redirected from the external identity provider
             // after a successful authentication flow (e.g Google or Facebook).
@@ -165,5 +87,45 @@ namespace server.Server {
             return SignOut(OpenIdConnectServerDefaults.AuthenticationScheme);
         }
 
+        private async Task<AuthenticationTicket> CreateTicketAsync(OpenIdConnectRequest request, ApplicationUser user)
+        {
+            // Create a new ClaimsPrincipal containing the claims that
+            // will be used to create an id_token, a token or a code.
+            var principal = await _signInManager.CreateUserPrincipalAsync(user);
+
+            // Note: by default, claims are NOT automatically included in the access and identity tokens.
+            // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
+            // whether they should be included in access tokens, in identity tokens or in both.
+
+            foreach (var claim in principal.Claims)
+            {
+                // In this sample, every claim is serialized in both the access and the identity tokens.
+                // In a real world application, you'd probably want to exclude confidential claims
+                // or apply a claims policy based on the scopes requested by the client application.
+                claim.SetDestinations(OpenIdConnectConstants.Destinations.AccessToken,
+                                      OpenIdConnectConstants.Destinations.IdentityToken);
+            }
+
+            // Create a new authentication ticket holding the user identity.
+            var ticket = new AuthenticationTicket(
+                principal, new AuthenticationProperties(),
+                OpenIdConnectServerDefaults.AuthenticationScheme);
+
+            // Set the list of scopes granted to the client application.
+            // Note: the offline_access scope must be granted
+            // to allow OpenIddict to return a refresh token.
+            ticket.SetScopes(new[] {
+                OpenIdConnectConstants.Scopes.OpenId,
+                OpenIdConnectConstants.Scopes.Email,
+                OpenIdConnectConstants.Scopes.Profile,
+                OpenIdConnectConstants.Claims.PreferredUsername,
+                OpenIdConnectConstants.Scopes.OfflineAccess,
+                OpenIddictConstants.Scopes.Roles
+            }.Intersect(request.GetScopes()));
+
+            ticket.SetResources("aurelia-openiddict-resources", "aurelia-openiddict-server");
+
+            return ticket;
+        }
     }
 }

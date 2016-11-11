@@ -13,7 +13,7 @@ export function configure(aurelia: Aurelia) {
 
   aurelia.use.plugin('aurelia-api', config => {
       config
-          .registerEndpoint('auth', 'http://localhost:54540/connect')
+          .registerEndpoint('auth', 'http://localhost:54540')
           .registerEndpoint('github', 'https://api.github.com/')
           .registerEndpoint('resources', 'http://localhost:25000/api/', { headers: { mode: 'no-cors' } });
 

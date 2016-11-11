@@ -43,13 +43,14 @@
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
-    "AspNet.Security.OAuth.Validation": "1.0.0-alpha2-final",
     "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0",
     "Microsoft.AspNetCore.Cors": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0",
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
-    "OpenIddict": "1.0.0-alpha2-0437"
+    "AspNet.Security.OAuth.Validation": "1.0.0-alpha3-0188",
+    "OpenIddict": "1.0.0-*",
+    "OpenIddict.Mvc": "1.0.0-*"
   },
     "tools": {
       "BundlerMinifier.Core": "2.0.238",

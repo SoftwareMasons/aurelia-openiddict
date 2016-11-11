@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AspNet.Security.OAuth.Validation;
+using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using OpenIddict;
+using server.Data;
 using server.Models;
-using server.Models.AccountViewModels;
 using server.Services;
+using server.Models.AccountViewModels;
 
 namespace server.Controllers
 {
@@ -21,20 +23,70 @@ namespace server.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
+        private readonly ApplicationDbContext _applicationDbContext;
+        private static bool _databaseChecked;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ApplicationDbContext applicationDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AccountController>();
+            _applicationDbContext = applicationDbContext;
+        }
+
+        //
+        // GET: /Account/Userinfo
+        [Authorize(ActiveAuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
+        [HttpGet, Produces("application/json")]
+        public async Task<IActionResult> Userinfo()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest(new OpenIdConnectResponse
+                {
+                    Error = OpenIdConnectConstants.Errors.InvalidGrant,
+                    ErrorDescription = "The user profile is no longer available."
+                });
+            }
+
+            var claims = new JObject();
+
+            // Note: the "sub" claim is a mandatory claim and must be included in the JSON response.
+            claims[OpenIdConnectConstants.Claims.Subject] = user.Id.ToString();
+
+            if (User.HasClaim(OpenIdConnectConstants.Claims.Scope, OpenIdConnectConstants.Scopes.Email))
+            {
+                claims[OpenIdConnectConstants.Claims.Email] = user.Email;
+                claims[OpenIdConnectConstants.Claims.EmailVerified] = user.EmailConfirmed;
+            }
+
+            if (User.HasClaim(OpenIdConnectConstants.Claims.Scope, OpenIdConnectConstants.Scopes.Phone))
+            {
+                claims[OpenIdConnectConstants.Claims.PhoneNumber] = user.PhoneNumber;
+                claims[OpenIdConnectConstants.Claims.PhoneNumberVerified] = user.PhoneNumberConfirmed;
+            }
+
+            if (User.HasClaim(OpenIdConnectConstants.Claims.Scope, OpenIddictConstants.Scopes.Roles))
+            {
+                claims[OpenIddictConstants.Claims.Roles] = JArray.FromObject(await _userManager.GetRolesAsync(user));
+            }
+
+            if (User.HasClaim(OpenIdConnectConstants.Claims.Scope, OpenIdConnectConstants.Scopes.Profile))
+            {
+                claims[OpenIdConnectConstants.Claims.PreferredUsername] = user.UserName;
+            }
+
+            // Note: the complete list of standard claims supported by the OpenID Connect specification
+            // can be found here: http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+
+            return Json(claims);
         }
 
         //
@@ -54,6 +106,7 @@ namespace server.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+            EnsureDatabaseCreated(_applicationDbContext);
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -62,7 +115,6 @@ namespace server.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, "User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -71,7 +123,6 @@ namespace server.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
                 }
                 else
@@ -102,6 +153,7 @@ namespace server.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
+            EnsureDatabaseCreated(_applicationDbContext);
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -112,11 +164,10 @@ namespace server.Controllers
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Context.Request.Scheme);
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                    //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
@@ -133,7 +184,6 @@ namespace server.Controllers
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
@@ -144,23 +194,19 @@ namespace server.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
+            EnsureDatabaseCreated(_applicationDbContext);
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            return Challenge(properties, provider);
+            return new ChallengeResult(provider, properties);
         }
 
         //
         // GET: /Account/ExternalLoginCallback
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
         {
-            if (remoteError != null)
-            {
-                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
-                return View(nameof(Login));
-            }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -171,7 +217,6 @@ namespace server.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
-                _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -215,7 +260,6 @@ namespace server.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -224,115 +268,6 @@ namespace server.Controllers
 
             ViewData["ReturnUrl"] = returnUrl;
             return View(model);
-        }
-
-        // GET: /Account/ConfirmEmail
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                return View("Error");
-            }
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return View("Error");
-            }
-            var result = await _userManager.ConfirmEmailAsync(user, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
-        }
-
-        //
-        // GET: /Account/ForgotPassword
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
-
-        //
-        // POST: /Account/ForgotPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByNameAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
-                }
-
-                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                // Send an email with this link
-                //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                //await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                //   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                //return View("ForgotPasswordConfirmation");
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        //
-        // GET: /Account/ForgotPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
-
-        //
-        // GET: /Account/ResetPassword
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPassword(string code = null)
-        {
-            return code == null ? View("Error") : View();
-        }
-
-        //
-        // POST: /Account/ResetPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var user = await _userManager.FindByNameAsync(model.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
-            }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
-            }
-            AddErrors(result);
-            return View();
-        }
-
-        //
-        // GET: /Account/ResetPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordConfirmation()
-        {
-            return View();
         }
 
         //
@@ -426,17 +361,30 @@ namespace server.Controllers
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning(7, "User account locked out.");
                 return View("Lockout");
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid code.");
+                ModelState.AddModelError("", "Invalid code.");
                 return View(model);
             }
         }
 
         #region Helpers
+
+        // The following code creates the database and schema if they don't exist.
+        // This is a temporary workaround since deploying database through EF migrations is
+        // not yet supported in this release.
+        // Please see this http://go.microsoft.com/fwlink/?LinkID=615859 for more information on how to do deploy the database
+        // when publishing your application.
+        private static void EnsureDatabaseCreated(ApplicationDbContext context)
+        {
+            if (!_databaseChecked)
+            {
+                _databaseChecked = true;
+                context.Database.EnsureCreated();
+            }
+        }
 
         private void AddErrors(IdentityResult result)
         {
@@ -446,9 +394,9 @@ namespace server.Controllers
             }
         }
 
-        private Task<ApplicationUser> GetCurrentUserAsync()
+        private async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            return _userManager.GetUserAsync(HttpContext.User);
+            return await _userManager.GetUserAsync(User);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

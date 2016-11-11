@@ -1,7 +1,7 @@
 ﻿export default {
     endpoint: 'auth',
     configureEndpoints: ['auth', 'resources'],
-    profileUrl: '/userinfo',
+    profileUrl: '/account/userinfo',
     loginRedirect: false,
     providers: {
       openiddict: {
