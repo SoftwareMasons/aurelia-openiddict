@@ -105,6 +105,9 @@ namespace server
 
             app.UseIdentity();
 
+            // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
+
+
             app.UseGoogleAuthentication(new GoogleOptions
             {
                 ClientId = "560027070069-37ldt4kfuohhu3m495hk2j4pjp92d382.apps.googleusercontent.com",
@@ -132,7 +135,6 @@ namespace server
 
             app.UseOpenIddict();
 
-            // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 
             app.UseMvc(routes =>
             {
@@ -140,6 +142,8 @@ namespace server
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseWelcomePage();
 
             using (var context = new ApplicationDbContext(app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {

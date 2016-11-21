@@ -168,7 +168,7 @@ namespace server.Controllers
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                     //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToLocal(returnUrl);
+                    return new RedirectResult(returnUrl + "#Successfully_Registered");
                 }
                 AddErrors(result);
             }
@@ -184,7 +184,7 @@ namespace server.Controllers
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return Redirect("/");
         }
 
         //
@@ -407,7 +407,7 @@ namespace server.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return Redirect("/");
             }
         }
 

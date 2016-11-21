@@ -1,11 +1,12 @@
 ﻿import {bindable, inject, BindingEngine, computedFrom, LogManager} from 'aurelia-framework';
-import {AuthService} from 'aurelia-authentication';
+import {AuthService, Popup} from 'aurelia-authentication';
 import {Router} from 'aurelia-router';
 import {Config, Rest} from 'aurelia-api';
 import {HttpClient} from 'aurelia-fetch-client';
-import {Logger} from 'aurelia-logging';
+import { Logger } from 'aurelia-logging';
+import authConfig from '../services/authConfig';
 
-@inject(AuthService, BindingEngine, Config)
+@inject(AuthService, BindingEngine, Config, Popup)
 export class NavBar {
     displayName: string = "";
     @bindable router: Router = null;
@@ -13,13 +14,15 @@ export class NavBar {
     private auth: AuthService = null;
     private bindingEngine: BindingEngine = null;
     private logger: Logger;
+    private popup: Popup;
 
-    constructor(auth, bindingEngine, config) {
+    constructor(auth, bindingEngine, config, popup) {
         this.auth = auth;
         this.bindingEngine = bindingEngine;
         this.authConfig = config;
         this.updateDisplayName();
-        this.logger = LogManager.getLogger('Nav-bar');     
+        this.logger = LogManager.getLogger('Nav-bar');
+        this.popup = popup;     
     }
 
     @computedFrom('auth.authenticated')
@@ -42,6 +45,13 @@ export class NavBar {
             });
     }
 
+    register() {
+      const popupOptions = authConfig.providers['openiddict'].popupOptions;
+      const popup = this.popup.open(authConfig.signupUrl, 'openiddict', popupOptions);
+      return popup.pollPopup().then(oauthData => {
+        this.authenticate();
+      });
+    } 
 
     private updateDisplayName() {
         if (this.auth.authenticated) {

@@ -27,6 +27,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" show.bind="!isAuthenticated">
                 <li><a href="#" click.delegate="authenticate()">Login</a></li>
+                <li><a href="#" click.delegate="register()">Register</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" show.bind="isAuthenticated">
                 <li><a href="/#">Welcome ${displayName}</a></li>
