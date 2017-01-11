@@ -12,9 +12,11 @@ using Microsoft.Extensions.Logging;
 using server.Data;
 using server.Models;
 using server.Services;
-using OpenIddict;
+using OpenIddict.Models;
+using OpenIddict.Core;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading;
 
 namespace server
 {
@@ -42,32 +44,38 @@ namespace server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
 
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseOpenIddict();
+            });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             //  Register the OpenIddict services, including the default Entity Framework stores.
-            services.AddOpenIddict<ApplicationDbContext>()
+            services.AddOpenIddict()
+                .AddEntityFrameworkCoreStores<ApplicationDbContext>()
                 .AddMvcBinders()
 
-                .EnableLogoutEndpoint("/connect/logout")
+
                 .EnableAuthorizationEndpoint("/connect/authorize")
+                .EnableLogoutEndpoint("/connect/logout")
+                .EnableIntrospectionEndpoint("/connect/introspect")
                 .EnableUserinfoEndpoint("/Account/UserInfo")
                 .AllowImplicitFlow()
                 .DisableHttpsRequirement()
-                    
+
                 //.EnableRequestCaching()
 
                 // To use JSONWebTokens, uncomment the following line.
                 .UseJsonWebTokens()
                 .AddEphemeralSigningKey();
 
+            services.AddCors();
             services.AddMvc();
 
             // Add application services.
@@ -99,6 +107,16 @@ namespace server
                     .AllowAnyMethod()
                     //.WithOrigins(["http://localhost:49862", "http://localhost:5000"]);
                     .AllowAnyOrigin();
+            });
+
+            app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), branch =>
+            {
+                branch.UseIdentity();
+            });
+
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), branch =>
+            {
+                branch.UseOAuthValidation();
             });
 
             app.UseStaticFiles();
@@ -145,34 +163,31 @@ namespace server
 
             app.UseWelcomePage();
 
-            using (var context = new ApplicationDbContext(app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+            InitializeAsync(app.ApplicationServices, CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        private async Task InitializeAsync(IServiceProvider services, CancellationToken cancellationToken)
+        {
+            // Create a new service scope to ensure the database context is correctly disposed when this methods returns.
+            using (var scope = services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                context.Database.EnsureCreated();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await context.Database.EnsureCreatedAsync();
 
-                if (!context.Applications.Any())
+                var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
+
+                if (await manager.FindByClientIdAsync("aurelia", cancellationToken) == null)
                 {
-                    context.Applications.Add(new OpenIddictApplication
+                    var application = new OpenIddictApplication
                     {
-                        // Assign a unique identifier to your client app:
-                        Id = new Guid().ToString(),
                         ClientId = "aurelia-openiddict",
-
-                        // Assign a display named used in the consent form page:
                         DisplayName = "Aurelia OpenIddict Sample",
-
-                        // Register the appropriate redirect_uri and post_logout_redirect_uri:
-                        RedirectUri = "http://localhost:49862/",
                         LogoutRedirectUri = "http://localhost:49862/",
+                        RedirectUri = "http://localhost:49862/",
+                        Type = "public"
+                    };
 
-                        // Generate a new derived key from the client secret:
-                        //ClientSecret = Crypto.HashPassword("secret_secret_secret"),
-
-                        // Note: use "public" for JS/mobile/desktop applications
-                        // and "confidential" for server-side applications.
-                        Type = OpenIddictConstants.ClientTypes.Public
-                    });
-
-                    context.SaveChanges();
+                    await manager.CreateAsync(application, cancellationToken);
                 }
             }
         }

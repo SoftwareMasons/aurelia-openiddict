@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict;
 using server.Models;
 using server.Models.SharedViewModels;
+using OpenIddict.Models;
+using OpenIddict.Core;
+using AspNet.Security.OpenIdConnect.Primitives;
 
 namespace AuthorizationServer
 {
@@ -43,7 +46,7 @@ namespace AuthorizationServer
             var request = HttpContext.GetOpenIdConnectRequest();
 
             // Retrieve the application details from the database.
-            var application = await _applicationManager.FindByClientIdAsync(request.ClientId);
+            var application = await _applicationManager.FindByClientIdAsync(request.ClientId, HttpContext.RequestAborted);
             if (application == null)
             {
                 return View("Error", new ErrorViewModel

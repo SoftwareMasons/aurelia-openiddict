@@ -9,7 +9,7 @@ using OpenIddict;
 
 namespace server.Data
 {
-    public class ApplicationDbContext : OpenIddictDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

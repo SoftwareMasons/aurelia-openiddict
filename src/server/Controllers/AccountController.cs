@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AspNet.Security.OAuth.Validation;
 using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +12,9 @@ using server.Data;
 using server.Models;
 using server.Services;
 using server.Models.AccountViewModels;
+using AspNet.Security.OpenIdConnect.Primitives;
+using OpenIddict.Core;
+using AspNet.Security.OAuth.Validation;
 
 namespace server.Controllers
 {
