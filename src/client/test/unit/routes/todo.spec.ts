@@ -1,12 +1,13 @@
-﻿import {ToDo} from 'src/routes/todo';
-import {DataServices} from 'src/services/dataServices';
+﻿import {ToDo} from '../../../src/routes/todo';
+import {DataServices} from '../../../src/services/dataServices';
 import {Rest} from 'aurelia-api';
 import {Container} from 'aurelia-dependency-injection';
 
 describe('ToDo', () => {
   const container = new Container();
   const httpClient = container.get(Rest);
-  const dataServices = new DataServices(httpClient);
+  const githubClient = container.get(Rest);
+  const dataServices = new DataServices(httpClient, githubClient);
   let sut = new ToDo(dataServices);
 
   describe('constructor()', () => {

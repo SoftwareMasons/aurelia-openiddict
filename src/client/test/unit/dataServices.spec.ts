@@ -1,5 +1,5 @@
 ﻿import {Container} from 'aurelia-dependency-injection';
-import {DataServices} from 'src/services/dataServices';
+import {DataServices} from '../../src/services/dataServices';
 import {Endpoint, Rest} from 'aurelia-api';
 
 describe('DataServices', () => {

@@ -13,25 +13,27 @@ namespace server.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
+                .HasAnnotation("ProductVersion", "1.1.1")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
                     b.Property<string>("Name")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
+                        .IsUnique()
                         .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
@@ -103,8 +105,6 @@ namespace server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("AspNetUserRoles");
                 });
 
@@ -123,9 +123,10 @@ namespace server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictApplication", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictApplication", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClientId");
 
@@ -147,24 +148,28 @@ namespace server.Migrations
                     b.ToTable("OpenIddictApplications");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictAuthorization", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictAuthorization", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApplicationId");
 
                     b.Property<string>("Scope");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("Subject");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ApplicationId");
 
                     b.ToTable("OpenIddictAuthorizations");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictScope", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictScope", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
 
@@ -173,17 +178,18 @@ namespace server.Migrations
                     b.ToTable("OpenIddictScopes");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictToken", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ApplicationId");
 
                     b.Property<string>("AuthorizationId");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Subject");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("Type");
 
                     b.HasKey("Id");
 
@@ -191,14 +197,13 @@ namespace server.Migrations
 
                     b.HasIndex("AuthorizationId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("OpenIddictTokens");
                 });
 
             modelBuilder.Entity("server.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
 
@@ -206,7 +211,7 @@ namespace server.Migrations
                         .IsConcurrencyToken();
 
                     b.Property<string>("Email")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
 
@@ -215,10 +220,10 @@ namespace server.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash");
 
@@ -231,7 +236,7 @@ namespace server.Migrations
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
@@ -282,26 +287,22 @@ namespace server.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictAuthorization", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictAuthorization", b =>
                 {
-                    b.HasOne("server.Models.ApplicationUser")
+                    b.HasOne("OpenIddict.Models.OpenIddictApplication", "Application")
                         .WithMany("Authorizations")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("ApplicationId");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
+            modelBuilder.Entity("OpenIddict.Models.OpenIddictToken", b =>
                 {
-                    b.HasOne("OpenIddict.OpenIddictApplication")
+                    b.HasOne("OpenIddict.Models.OpenIddictApplication", "Application")
                         .WithMany("Tokens")
                         .HasForeignKey("ApplicationId");
 
-                    b.HasOne("OpenIddict.OpenIddictAuthorization")
+                    b.HasOne("OpenIddict.Models.OpenIddictAuthorization", "Authorization")
                         .WithMany("Tokens")
                         .HasForeignKey("AuthorizationId");
-
-                    b.HasOne("server.Models.ApplicationUser")
-                        .WithMany("Tokens")
-                        .HasForeignKey("UserId");
                 });
         }
     }

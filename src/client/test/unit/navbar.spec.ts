@@ -1,6 +1,6 @@
-﻿import {NavBar} from 'src/customElements/nav-bar';
+﻿import {NavBar} from '../../src/customElements/nav-bar';
 import {Container} from 'aurelia-dependency-injection';
-import {AuthService} from 'aurelia-authentication';
+import {AuthService, Popup} from 'aurelia-authentication';
 import {BindingEngine} from 'aurelia-framework';
 import {Config} from 'aurelia-api';
 
@@ -8,9 +8,10 @@ describe('Navbar', () => {
   const container = new Container();
   let authService = container.get(AuthService);
   let bindingEngine = container.get(BindingEngine);
+  let popup = container.get(Popup);
   let config = container.get(Config);
 
-  let sut = new NavBar(authService, bindingEngine, config);
+  let sut = new NavBar(authService, bindingEngine, config, popup);
 
   describe('authenticate()', () => {
     it('should set displayName to preferred_username', done => {

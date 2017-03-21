@@ -11,6 +11,7 @@ using resources.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using resources.Services;
+using AspNet.Security.OAuth.Validation;
 
 namespace resources
 {
@@ -51,21 +52,26 @@ namespace resources
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseCors(options =>
+            app.UseCors(builder =>
             {
-                options.AllowAnyHeader();
-                options.AllowAnyMethod();
-                options.AllowAnyOrigin();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.AllowAnyOrigin();
+                //builder.WithOrigins("http://localhost:49862");
+                //builder.WithMethods("GET");
+                //builder.WithHeaders("Authorization");
             });
 
-            app.UseJwtBearerAuthentication(new JwtBearerOptions()
-            {
-                RequireHttpsMetadata = false,
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                Audience = "aurelia-openiddict-resources",
-                Authority = "http://localhost:54540/"
-            });
+            app.UseOAuthValidation();
+
+            //app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            //{
+            //    RequireHttpsMetadata = false,
+            //    AutomaticAuthenticate = true,
+            //    AutomaticChallenge = true,
+            //    Audience = "aurelia-openiddict-resources",
+            //    Authority = "http://localhost:54540/"
+            //});
 
             app.UseMvc();
         }

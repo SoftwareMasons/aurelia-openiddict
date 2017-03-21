@@ -1,4 +1,4 @@
-import {ChildRouter} from 'src/routes/child-router';
+import {ChildRouter} from '../../../src/routes/child-router';
 
 class RouterStub {
   routes;

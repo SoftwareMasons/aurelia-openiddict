@@ -5,7 +5,7 @@ import {DataServices} from '../services/dataServices';
 export class Users {
   heading = 'Github Users';
   users = [];
-  private dataServices: DataServices;
+  dataServices: DataServices;
 
   constructor(dataServices: DataServices) {
       this.dataServices = dataServices;

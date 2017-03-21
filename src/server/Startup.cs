@@ -17,6 +17,7 @@ using OpenIddict.Core;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading;
+using AspNet.Security.OpenIdConnect.Primitives;
 
 namespace server
 {
@@ -32,7 +33,7 @@ namespace server
             if (env.IsDevelopment())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
+                builder.AddUserSecrets<Startup>();
             }
 
             builder.AddEnvironmentVariables();
@@ -53,8 +54,14 @@ namespace server
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                options.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
 
             //  Register the OpenIddict services, including the default Entity Framework stores.
             services.AddOpenIddict()
@@ -65,14 +72,14 @@ namespace server
                 .EnableAuthorizationEndpoint("/connect/authorize")
                 .EnableLogoutEndpoint("/connect/logout")
                 .EnableIntrospectionEndpoint("/connect/introspect")
-                .EnableUserinfoEndpoint("/Account/UserInfo")
+                .EnableUserinfoEndpoint("/api/userinfo")
                 .AllowImplicitFlow()
                 .DisableHttpsRequirement()
 
                 //.EnableRequestCaching()
 
                 // To use JSONWebTokens, uncomment the following line.
-                .UseJsonWebTokens()
+                //.UseJsonWebTokens()
                 .AddEphemeralSigningKey();
 
             services.AddCors();
@@ -100,14 +107,17 @@ namespace server
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseCors(options =>
+            app.UseCors(builder =>
             {
-                options
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    //.WithOrigins(["http://localhost:49862", "http://localhost:5000"]);
-                    .AllowAnyOrigin();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.AllowAnyOrigin();
+                //builder.WithOrigins("http://localhost:49862");
+                //builder.WithMethods("GET");
+                //builder.WithHeaders("Authorization");
             });
+
+            //app.UseStaticFiles();
 
             app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), branch =>
             {
@@ -119,13 +129,7 @@ namespace server
                 branch.UseOAuthValidation();
             });
 
-            app.UseStaticFiles();
-
-            app.UseIdentity();
-
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
-
-
             app.UseGoogleAuthentication(new GoogleOptions
             {
                 ClientId = "560027070069-37ldt4kfuohhu3m495hk2j4pjp92d382.apps.googleusercontent.com",
@@ -138,21 +142,7 @@ namespace server
                 ConsumerSecret = "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI"
             });
 
-
-            //  If using JSONWebTokens, uncomment the following lines and
-            //  comment out the line above that is used for the default
-            //  opaque token usage.
-            app.UseJwtBearerAuthentication(new JwtBearerOptions()
-            {
-                Audience = "aurelia-openiddict-server",
-                Authority = "http://localhost:54540/",
-                RequireHttpsMetadata = false,
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true
-            });
-
             app.UseOpenIddict();
-
 
             app.UseMvc(routes =>
             {
@@ -176,7 +166,7 @@ namespace server
 
                 var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
 
-                if (await manager.FindByClientIdAsync("aurelia", cancellationToken) == null)
+                if (await manager.FindByClientIdAsync("aurelia-openiddict", cancellationToken) == null)
                 {
                     var application = new OpenIddictApplication
                     {

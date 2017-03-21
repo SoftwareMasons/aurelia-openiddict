@@ -1,6 +1,6 @@
 import {Container} from 'aurelia-dependency-injection';
-import {Users} from 'src/routes/users';
-import {DataServices} from 'src/services/dataServices';
+import {Users} from '../../../src/routes/users';
+import {DataServices} from '../../../src/services/dataServices';
 
 describe('the Users module', () => {
   const container = new Container();

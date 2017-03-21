@@ -1,7 +1,7 @@
 ﻿export default {
     endpoint: 'auth',
     configureEndpoints: ['auth', 'resources'],
-    profileUrl: '/account/userinfo',
+    profileUrl: '/api/userinfo',
     loginRedirect: false,
     signupUrl: 'http://localhost:54540/account/register?returnUrl=http://localhost:49862/',
     providers: {

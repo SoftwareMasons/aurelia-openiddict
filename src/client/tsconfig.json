@@ -1,16 +1,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": "src/",
     "outDir": "wwwroot/dist",
-    "sourceMap": false,
+    "sourceMap": true,
     "target": "es5",
     "module": "amd",
     "declaration": false,
     "noImplicitAny": false,
-    "removeComments": true,
+    "removeComments": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true,
     "moduleResolution": "node",
     "lib": ["es2015", "dom"]
   },

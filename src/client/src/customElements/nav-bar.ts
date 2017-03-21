@@ -56,7 +56,7 @@ export class NavBar {
     private updateDisplayName() {
         if (this.auth.authenticated) {
             this.auth.getMe().then(response => {
-                return this.displayName = response.preferred_username;
+                return this.displayName = response.email;
             });
         } else {
             this.displayName = '';

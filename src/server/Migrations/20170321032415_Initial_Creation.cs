@@ -113,6 +113,26 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OpenIddictAuthorizations",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    ApplicationId = table.Column<string>(nullable: true),
+                    Scope = table.Column<string>(nullable: true),
+                    Subject = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpenIddictAuthorizations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OpenIddictAuthorizations_OpenIddictApplications_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "OpenIddictApplications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -178,33 +198,14 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OpenIddictAuthorizations",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    Scope = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OpenIddictAuthorizations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OpenIddictAuthorizations_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OpenIddictTokens",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     ApplicationId = table.Column<string>(nullable: true),
                     AuthorizationId = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: true)
+                    Subject = table.Column<string>(nullable: true),
+                    Type = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -221,18 +222,13 @@ namespace server.Migrations
                         principalTable: "OpenIddictAuthorizations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OpenIddictTokens_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
-                column: "NormalizedName");
+                column: "NormalizedName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -255,20 +251,15 @@ namespace server.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_UserId",
-                table: "AspNetUserRoles",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictApplications_ClientId",
                 table: "OpenIddictApplications",
                 column: "ClientId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_OpenIddictAuthorizations_UserId",
+                name: "IX_OpenIddictAuthorizations_ApplicationId",
                 table: "OpenIddictAuthorizations",
-                column: "UserId");
+                column: "ApplicationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictTokens_ApplicationId",
@@ -279,11 +270,6 @@ namespace server.Migrations
                 name: "IX_OpenIddictTokens_AuthorizationId",
                 table: "OpenIddictTokens",
                 column: "AuthorizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OpenIddictTokens_UserId",
-                table: "OpenIddictTokens",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -324,13 +310,13 @@ namespace server.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "OpenIddictApplications");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictAuthorizations");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "OpenIddictApplications");
         }
     }
 }
