@@ -176,8 +176,16 @@ namespace server
                         RedirectUri = "http://localhost:49862/",
                         Type = "public"
                     };
-
                     await manager.CreateAsync(application, cancellationToken);
+                }
+
+                if (await manager.FindByClientIdAsync("aurelia-openiddict-resources", cancellationToken) == null)
+                {
+                    var application = new OpenIddictApplication
+                    {
+                        ClientId = "aurelia-openiddict-resources"
+                    };
+                    await manager.CreateAsync(application, "846B62D0-DEF9-4215-A99D-86E6B8DAB342", cancellationToken);
                 }
             }
         }

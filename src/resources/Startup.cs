@@ -11,7 +11,6 @@ using resources.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using resources.Services;
-using AspNet.Security.OAuth.Validation;
 
 namespace resources
 {
@@ -52,6 +51,19 @@ namespace resources
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseOAuthIntrospection(options =>
+            {
+                options.Authority = new Uri("http://localhost:54540/");
+                options.Audiences.Add("aurelia-openiddict-resources");
+                options.ClientId = "aurelia-openiddict-resources";
+                options.ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342";
+                options.RequireHttpsMetadata = false;
+
+                // Note: you can override the default name and role claims:
+                // options.NameClaimType = "custom_name_claim";
+                // options.RoleClaimType = "custom_role_claim";
+            });
+
             app.UseCors(builder =>
             {
                 builder.AllowAnyHeader();
@@ -62,7 +74,6 @@ namespace resources
                 //builder.WithHeaders("Authorization");
             });
 
-            app.UseOAuthValidation();
 
             //app.UseJwtBearerAuthentication(new JwtBearerOptions()
             //{
